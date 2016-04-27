@@ -56,11 +56,11 @@ for k = 1:num_labels
     for step = 0:length(y)
         %fmincg(@(t)(lrCostFunction(t, X, (y == k), lambda)), X, initial_theta, options);
         [J, gard] = lrCostFunction(theta, X, (y == k), lambda);
-        theta = theta - 0.01 * gard;
+        theta = theta - 0.1 * gard;
         theta;
     end
     for i=1:(n + 1)
-        all_theta(k, i) = theta(k, 1);
+        all_theta(k, i) = theta(i, 1);
     end
 end
 
