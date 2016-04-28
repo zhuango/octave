@@ -62,7 +62,7 @@ load('ex3weights.mat');
 
 pred = predict(Theta1, Theta2, X);
 
-fprintf('\nTraining Set Accuracy: %f\n', mean(double(pred == y)) * 100);
+fprintf('\nTraining Set Accuracy: %f\n', sum(double(pred' == y)) / length(y));
 
 fprintf('Program paused. Press enter to continue.\n');
 pause;
