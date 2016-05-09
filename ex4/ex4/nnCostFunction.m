@@ -67,7 +67,7 @@ Theta2_grad = zeros(size(Theta2));
 % Theta1 25 , 401
 % Theta2 10, 26
 % y 5000, 1
-Y = zeros(10, 5000);
+Y = zeros(num_labels, m);
 for i = 1:m
     Y(y(i, 1), i) = 1;
 end
@@ -84,6 +84,7 @@ z3 = Theta2 * (a2_bis');%10 x 5000
 a3 = sigmoid(z3);%10 x 5000
 %size(Y.*log(h) - (1 - Y).*log(h))
 %size(a3)
+size(a3)
 J = (1 / m) * sum(sum( -Y.*log(a3) - (1 - Y).*log(1- a3) ))
 
 %Regularized
@@ -103,25 +104,28 @@ end
 J = J + (lambda/(2 * m)) * (sumTheta1 + sumTheta2)
 
 % -------------------------------------------------------------
-bigDelta2 = zeros(num_labels, a2_layer_size)
-bigDelta1 = zeros(a2_layer_size, input_layer_size)
+bigDelta2 = zeros(num_labels, a2_layer_size);
+bigDelta1 = zeros(a2_layer_size, input_layer_size);
 for i = 1:m
+    if mod(i, 1000) == 0,
+        fprintf('iter: %d\n', i);
+    end
     item_a3 = a3(1:num_labels, i); % 10 x 1
     item_Y = Y(1:num_labels, i); % 10 x 1
     delta3 = item_a3 - item_Y; % 10 x 1
     
-    item_z2 = z2(1:num_labels, i);
+    item_z2 = z2(1:a2_layer_size, i);%25 x 1
     delta2 = (Theta2(:, 2:end)' * delta3) .* sigmoidGradient(item_z2);%25 * 1
     
-    item_a2 = a2(1:num_labels, i);%25 x 1
+    item_a2 = a2(1:a2_layer_size, i);%25 x 1
     bigDelta2 = bigDelta2 + delta3 * (item_a2');%10 x 25
     
-    item_a1 = a1'(1:num_labels, i);% 400 x 1
+    item_a1 = a1'(1:input_layer_size, i);% 400 x 1
     bigDelta1 = bigDelta1 + delta2 * (item_a1');%25 x 400
     
 end
-Theta1_grad = (1 / m) * [ones(a2_layer_size, 1), bigDelta1]
-Theta2_grad = (1 / m) * [ones(num_labels, 1), bigDelta2]
+Theta1_grad = (1 / m) * [ones(a2_layer_size, 1), bigDelta1];
+Theta2_grad = (1 / m) * [ones(num_labels, 1), bigDelta2];
 % =========================================================================
 
 % Unroll gradients
