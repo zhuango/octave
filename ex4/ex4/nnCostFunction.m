@@ -1,11 +1,11 @@
 function [J grad] = nnCostFunction(nn_params, ...
                                    input_layer_size, ...
-                                   hidden_layer_size, ...
+                                   a2_layer_size, ...
                                    num_labels, ...
                                    X, y, lambda)
 %NNCOSTFUNCTION Implements the neural network cost function for a two layer
 %neural network which performs classification
-%   [J grad] = NNCOSTFUNCTON(nn_params, hidden_layer_size, num_labels, ...
+%   [J grad] = NNCOSTFUNCTON(nn_params, a2_layer_size, num_labels, ...
 %   X, y, lambda) computes the cost and gradient of the neural network. The
 %   parameters for the neural network are "unrolled" into the vector
 %   nn_params and need to be converted back into the weight matrices. 
@@ -16,11 +16,11 @@ function [J grad] = nnCostFunction(nn_params, ...
 
 % Reshape nn_params back into the parameters Theta1 and Theta2, the weight matrices
 % for our 2 layer neural network
-Theta1 = reshape(nn_params(1:hidden_layer_size * (input_layer_size + 1)), ...
-                 hidden_layer_size, (input_layer_size + 1));
+Theta1 = reshape(nn_params(1:a2_layer_size * (input_layer_size + 1)), ...
+                 a2_layer_size, (input_layer_size + 1));
 
-Theta2 = reshape(nn_params((1 + (hidden_layer_size * (input_layer_size + 1))):end), ...
-                 num_labels, (hidden_layer_size + 1));
+Theta2 = reshape(nn_params((1 + (a2_layer_size * (input_layer_size + 1))):end), ...
+                 num_labels, (a2_layer_size + 1));
 
 % Setup some useful variables
 m = size(X, 1);
@@ -62,25 +62,58 @@ Theta2_grad = zeros(size(Theta2));
 %               and Theta2_grad from Part 2.
 %
 
+% layer unit count: 400， 25, 10
+% X, 5000, 400
+% Theta1 25 , 401
+% Theta2 10, 26
+% y 5000, 1
+Y = zeros(10, 5000);
+for i = 1:m
+    Y(y(i, 1), i) = 1;
+end
 
+%size(Theta1)
+%size(Theta2)
+%size(X)
+a1 = [ones(m, 1), X];%5000 x 401
+z2 = Theta1 * (a1')% 25 x 5000
+a2 = sigmoid(z2);% 25 x 5000
+a2 = [ones(m, 1), a2'];%26 x 5000
+z3 = Theta2 * (a2')%10 x 5000
+a3 = sigmoid(z3);%10 x 5000
+%size(Y.*log(h) - (1 - Y).*log(h))
+size(a3)
+J = (1 / m) * sum(sum( -Y.*log(a3) - (1 - Y).*log(1- a3) ))
 
+%Regularized
+sumTheta1 = 0.0;
+for i = 1:size(Theta1, 1)
+    for j = 2:(size(Theta1, 2))
+        sumTheta1 = sumTheta1 + Theta1(i, j)*Theta1(i, j);
+    end
+end
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+sumTheta2 = 0.0;
+for i = 1:size(Theta2, 1)
+    for j = 2:(size(Theta2, 2))
+        sumTheta2 = sumTheta2 + Theta2(i, j)*Theta2(i, j);
+    end
+end
+J = J + (lambda/(2 * m)) * (sumTheta1 + sumTheta2);
 
 % -------------------------------------------------------------
+bigDelta2 = 0
+bigDelta1 = 0
+for i = 1:m
+    item_a3 = a3(1:num_labels, i) % 10 x 1
+    item_Y = Y(1:num_labels, i) % 10 x 1
+    delta3 = item_a3 - item_Y % 10 x 1
+    
+    item_z2 = z2(1:num_labels, i)
+    delta2 = (Theta2(:, 2:end)' * delta3) .* sigmoidGradient(item_z2)%25 * 1
+    
+    bigDelta2 = bigDelta2 + delta3 * (delta2')
+end
 
 % =========================================================================
 
