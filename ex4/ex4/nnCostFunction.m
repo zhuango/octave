@@ -72,9 +72,6 @@ for i = 1:m
     Y(y(i, 1), i) = 1;
 end
 
-%size(Theta1)
-%size(Theta2)
-%size(X)
 a1 = X;%5000 x 400
 a1_bis = [ones(m, 1), X]';%401 x 5000 
 z2 = Theta1 * (a1_bis);% 25 x 5000
@@ -84,7 +81,6 @@ z3 = Theta2 * (a2_bis');%10 x 5000
 a3 = sigmoid(z3);%10 x 5000
 %size(Y.*log(h) - (1 - Y).*log(h))
 %size(a3)
-size(a3)
 J = (1 / m) * sum(sum( -Y.*log(a3) - (1 - Y).*log(1- a3) ))
 
 %Regularized
@@ -124,8 +120,15 @@ for i = 1:m
     bigDelta1 = bigDelta1 + delta2 * (item_a1');%25 x 400
     
 end
-Theta1_grad = (1 / m) * [ones(a2_layer_size, 1), bigDelta1];
-Theta2_grad = (1 / m) * [ones(num_labels, 1), bigDelta2];
+for i = 1:a2_layer_size
+    Theta1(i,1) = 0;
+end
+for i = 1:num_labels
+    Theta2(i,1) = 0;
+end
+
+Theta1_grad = (1 / m) * [ones(a2_layer_size, 1), bigDelta1] + (lambda/ m) * Theta1;
+Theta2_grad = (1 / m) * [ones(num_labels, 1), bigDelta2] + (lambda / m) * Theta2;
 % =========================================================================
 
 % Unroll gradients
