@@ -21,7 +21,22 @@ idx = zeros(size(X,1), 1);
 % Note: You can use a for-loop over the examples to compute this.
 %
 
+for i = 1:size(idx)
+    closestIdx = 1;
+    itemX = X(i, 1:size(X, 2));
+    itemCentroid = centroids(1, 1:size(centroids, 2));
+    distance = sum((itemX - itemCentroid).^2);
 
+    for j = 2:K
+        itemCentroid = centroids(j, 1:size(centroids, 2));
+        newDistance = sum((itemX - itemCentroid).^2);
+        if(newDistance < distance)
+            closestIdx = j;
+            distance = newDistance;
+        end
+    end
+    idx(i) = closestIdx;
+end
 
 
 
