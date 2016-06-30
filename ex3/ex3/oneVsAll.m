@@ -51,26 +51,33 @@ X = [ones(m, 1) X];
 theta = zeros(n + 1, 1);
 options = optimset('GradObj', 'on', 'MaxIter', 50);
 
-for k = 1:num_labels
-    theta = zeros(n + 1, 1);
-    for step = 0:length(y)
-        %fmincg(@(t)(lrCostFunction(t, X, (y == k), lambda)), X, initial_theta, options);
-        [J, gard] = lrCostFunction(theta, X, (y == k), lambda);
-        theta = theta - 0.1 * gard;
-        theta;
+% for k = 1:num_labels
+%     theta = zeros(n + 1, 1);
+%     for step = 0:length(y)
+%         %fmincg(@(t)(lrCostFunction(t, X, (y == k), lambda)), X, initial_theta, options);
+%         [J, gard] = lrCostFunction(theta, X, (y == k), lambda);
+%         theta = theta - 0.1 * gard;
+%         theta;
+%     end
+%     for i=1:(n + 1)
+%         all_theta(k, i) = theta(i, 1);
+%     end
+% end
+
+
+% % Set Options
+% options = optimset('GradObj', 'on', 'MaxIter', 400);
+
+% Optimize
+for c =1:num_labels
+    initial_theta = zeros(n + 1, 1);
+    [theta] = ...
+        fmincg(@(t)(lrCostFunction(t, X, (y == c), lambda)), initial_theta, options);
+    for i = 1:(n + 1)
+        all_theta(c, i) = theta(i, 1);
     end
-    for i=1:(n + 1)
-        all_theta(k, i) = theta(i, 1);
-    end
+
 end
-
-
-
-
-
-
-
-
 % =========================================================================
 
 
