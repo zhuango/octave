@@ -1,2 +1,2 @@
 # octave
-implement for machine learning algorithms
+octave code of machine-learning homework (Ng)
